@@ -1,0 +1,31 @@
+1) How did you implement your solution?
+
+This solution is built on Node.js, AngularJS, and Express.
+
+To run the solution, first install Node if you haven't. Download the repo and navigate to the folder. Then run "npm install" followed by "node server.js" to start the app, and it will be running on localhost:3000. Simply go to this page to view the assignment data.
+
+Files:
+- /public/controllers/controller.js - contains the logic for creating the package assignments
+- server.js - contains the local API endpoints which retrieve the drone and package data. The API contains two endpoints: 
+	- /getDrones
+	- /getPackages
+
+- /public/index.html - basic HTML page which displays the assignment results
+
+The way I implemented the solution was as follows: first I created two local API endpoints to get the third party drone and package data. The API sends back the raw JSON of the drone and package data. The angular controller in the front end is where the logic to create the package assignments lives. For this logic, I first sorted the list of packages by their soonest deadline, so that the most urgent packages get assigned first. Next I iterated over the list of sorted packages and for each package, used a helper function to determine which drone could deliver that package the soonest. Then I checked to see if the drone that could deliver the package the soonest would be able to deliver it by the deadline. If it was able to, then we have found an assignment for the package, and it gets added to the assignments list. The assigned drone then gets removed from the list of drones. If the package CAN'T be delivered by the deadline, then its packageId gets added to the unassigned package IDs, because no drone can successfully deliver it by the deadline. This logic repeats for all the packages, so once the list of drones is empty, the rest of the packages in the list go into the unassigned package IDs, because there are no drones left to account for them. 
+
+The data then gets added to a JSON object variable in the controller which is accessible from the view, and is displayed as raw JSON on the page.
+
+2) Why did you implement it this way?
+
+As far as the stack goes, I'm comfortable with Node and Angular so I just naturally chose them. I chose to include a front end which has access to the assignment data, because this could be used in the future to display the data using a UI. 
+
+For the assignment logic, we have to assign every package, so naturally I thought to iterate over them in order of their urgency. Then we have to pick a drone to assign the package to based on the given criteria, so we needed to figure out which drone could deliver each package the fastest. 
+
+I wanted to make my implementation the most direct interpretation of the given criteria, so that's why I implemented it the way I did.
+
+3) Let's assume we need to handle dispatching thousands of jobs per second to thousands of drivers. Would the solution you've implemented still work? Why or why not? What would you modify? 
+
+If we were to handle thousands of jobs per second, I think my solution would work to some extent, but it would be inefficient. Since it gets all of the package and drone data every time it loads the page, it would be slower to handle thousands of new drones and packages every second. It would be more efficient to watch for new drones and packages and get that data instead, instead of grabbing all the available data every time. Additionally, if this wasn't a static page that was just returning one set of data, then we might need to consider allowing the drones to be added to some sort of queue so they can be available again after they deliver their assigned package.
+
+
